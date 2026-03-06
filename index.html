@@ -1,31 +1,44 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-<title>Free Tools Website</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Jagesh Website</title>
 <style>
-body{font-family:Arial;text-align:center;background:#f2f2f2}
-h1{color:#333}
-button{padding:10px 20px;margin:10px;font-size:16px}
+body {
+  font-family: Arial, sans-serif;
+  text-align: center;
+  padding: 50px;
+  background-color: #f2f2f2;
+}
+h1 {
+  color: #333;
+}
+p {
+  font-size: 18px;
+  color: #555;
+}
+.ad-space {
+  margin: 20px auto;
+  width: 300px;
+  height: 250px;
+  background-color: #ccc;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #333;
+  font-weight: bold;
+}
 </style>
 </head>
 <body>
+<h1>Welcome to Jagesh’s Website</h1>
+<p>This website is created using Netlify + GitHub.</p>
 
-<h1>My Free Tools Website</h1>
+<div class="ad-space">
+  AdSense / Advertisement
+</div>
 
-<h3>Age Calculator</h3>
-<input type="date" id="dob">
-<button onclick="age()">Calculate Age</button>
-<p id="result"></p>
-
-<script>
-function age(){
-let dob=document.getElementById("dob").value;
-let birth=new Date(dob);
-let today=new Date();
-let age=today.getFullYear()-birth.getFullYear();
-document.getElementById("result").innerHTML="Your Age: "+age;
-}
-</script>
-
+<p>Share this website with your friends!</p>
 </body>
 </html>
