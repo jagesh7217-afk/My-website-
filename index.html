@@ -1,38 +1,81 @@
-<!DOCTYPE html>
-<html>
-<head>
-<title>Jagesh Website</title>
+import os
+from bs4 import BeautifulSoup
+import shutil
 
-<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7645822056874819"
-crossorigin="anonymous"></script>
+# ===== Folders =====
+source_folder = "/path/to/your/html_files"       # ← Aapka original HTML folder
+upload_folder = "/path/to/upload_ready"          # ← Upload-ready folder
 
-</head>
+# ===== Ensure upload folder exists =====
+if not os.path.exists(upload_folder):
+    os.makedirs(upload_folder)
 
-<body>
+# ===== Get all HTML files =====
+html_files = [f for f in os.listdir(source_folder) if f.endswith(".html")]
+html_files.sort()  # alphabetical order, optional
 
-<h1>Welcome to Jagesh</h1>
-<p>This is my first website.</p>
+# ===== Process each file =====
+for idx, filename in enumerate(html_files, start=1):
+    src_path = os.path.join(source_folder, filename)
 
-<h2>About Us</h2>
-<p>This website is created by Jagesh to share useful information.</p>
+    # Read HTML
+    with open(src_path, 'r', encoding='utf-8') as f:
+        content = f.read()
 
-<h2>Contact</h2>
-<p>Email: jagesh@example.com</p>
+    soup = BeautifulSoup(content, 'html.parser')
+    issues = []
 
-<h2>Privacy Policy</h2>
-<p>This site may use cookies and Google AdSense to show ads.</p>
+    # ===== 1️⃣ Title Check =====
+    if not soup.title or len(soup.title.text.strip()) == 0:
+        issues.append("Missing title")
+        new_title = soup.new_tag('title')
+        new_title.string = f"Article {idx} – Default Title"
+        if soup.head:
+            soup.head.append(new_title)
+        else:
+            new_head = soup.new_tag('head')
+            new_head.append(new_title)
+            soup.insert(0, new_head)
 
-<!-- AdSense Ad -->
-<ins class="adsbygoogle"
-style="display:block"
-data-ad-client="ca-pub-7645822056874819"
-data-ad-slot="1234567890"
-data-ad-format="auto"
-data-full-width-responsive="true"></ins>
+    # ===== 2️⃣ Content Check =====
+    text = soup.get_text()
+    word_count = len(text.split())
+    if word_count < 500:
+        issues.append(f"Content too short ({word_count} words)")
+        # Optional: Add placeholder paragraph to increase content
+        placeholder = soup.new_tag('p')
+        placeholder.string = "This article is being updated with more content soon."
+        if soup.body:
+            soup.body.append(placeholder)
+        else:
+            new_body = soup.new_tag('body')
+            new_body.append(placeholder)
+            soup.append(new_body)
 
-<script>
-(adsbygoogle = window.adsbygoogle || []).push({});
-</script>
+    # ===== 3️⃣ Image Check =====
+    for img in soup.find_all('img'):
+        if not img.get('alt'):
+            issues.append("Image missing alt tag")
+            img['alt'] = "Image description coming soon"
+        if 'copyright' in img.get('src','').lower():
+            issues.append("Potential copyrighted image - replace recommended")
 
-</body>
-</html>
+    # ===== 4️⃣ Privacy Policy / About Us Page Link Check =====
+    if not soup.find('a', string=lambda x: x and "Privacy Policy" in x):
+        issues.append("Privacy Policy link missing")
+    if not soup.find('a', string=lambda x: x and "About Us" in x):
+        issues.append("About Us link missing")
+
+    # ===== Print Issues =====
+    if issues:
+        print(f"Issues in {filename}: {issues}")
+
+    # ===== 5️⃣ Save with Index =====
+    name, ext = os.path.splitext(filename)
+    new_filename = f"{idx}-{name}{ext}"
+    dest_path = os.path.join(upload_folder, new_filename)
+
+    with open(dest_path, 'w', encoding='utf-8') as f:
+        f.write(str(soup))
+
+print("✅ All HTML files processed, basic fixes applied, and ready for Netlify upload!")
